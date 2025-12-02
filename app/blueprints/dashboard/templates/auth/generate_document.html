@@ -1,0 +1,487 @@
+{% extends "base.html" %}
+
+{% block title %}Generar Documento - SaaS App{% endblock %}
+
+{% block extra_css %}
+<style>
+    .document-preview {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background-size: 400% 400%;
+        animation: gradientBG 15s ease infinite;
+    }
+    
+    @keyframes gradientBG {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Encabezado -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                <i class="bi bi-file-earmark-plus mr-2 text-blue-600 dark:text-blue-400"></i>Generar Nuevo Documento
+            </h1>
+            <p class="text-gray-600 dark:text-gray-300">
+                Crea documentos profesionales en minutos
+            </p>
+        </div>
+        <div class="mt-4 md:mt-0">
+            <a href="{{ url_for('dashboard.index') }}" 
+               class="inline-flex items-center px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-medium rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600 transition-all duration-200">
+                <i class="bi bi-arrow-left mr-2"></i>
+                Volver al Dashboard
+            </a>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Formulario -->
+        <div class="lg:col-span-2">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+                <!-- Alert Informativo -->
+                <div class="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                    <div class="flex items-center">
+                        <i class="bi bi-info-circle text-blue-600 dark:text-blue-400 text-xl mr-3"></i>
+                        <div>
+                            <h4 class="font-medium text-blue-800 dark:text-blue-300">Modo de demostración</h4>
+                            <p class="text-sm text-blue-700 dark:text-blue-400 mt-1">
+                                Este formulario es una simulación. Los datos no se enviarán a ningún servidor real.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="documentForm" method="POST" action="{{ url_for('dashboard.generate_document') }}">
+                    <!-- Tipo de Documento -->
+                    <div class="mb-6">
+                        <label for="documentType" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            <i class="bi bi-card-checklist mr-2"></i>Tipo de Documento
+                        </label>
+                        <select id="documentType" name="documentType" 
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
+                            <option selected disabled value="">Selecciona un tipo de documento...</option>
+                            <option value="contrato">Contrato de Servicios</option>
+                            <option value="factura">Factura Comercial</option>
+                            <option value="propuesta">Propuesta Técnica</option>
+                            <option value="informe">Informe de Proyecto</option>
+                            <option value="carta">Carta Formal</option>
+                            <option value="certificado">Certificado</option>
+                        </select>
+                    </div>
+
+                    <!-- Nombre del Documento -->
+                    <div class="mb-6">
+                        <label for="documentName" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            <i class="bi bi-fonts mr-2"></i>Nombre del Documento
+                        </label>
+                        <input type="text" id="documentName" name="documentName"
+                               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                               placeholder="Ej: Contrato de Servicios 2024 - Cliente XYZ" required>
+                    </div>
+
+                    <!-- Plantilla -->
+                    <div class="mb-6">
+                        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            <i class="bi bi-layout-wtf mr-2"></i>Plantilla
+                        </label>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <input type="radio" id="template1" name="template" value="modern" class="hidden peer" checked>
+                                <label for="template1" class="inline-flex justify-between items-center p-3 w-full text-gray-500 bg-white rounded-lg border border-gray-200 cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700">
+                                    <div class="block">
+                                        <div class="font-semibold">Moderno</div>
+                                        <div class="text-xs">Diseño contemporáneo</div>
+                                    </div>
+                                    <i class="bi bi-check-circle text-lg"></i>
+                                </label>
+                            </div>
+                            <div>
+                                <input type="radio" id="template2" name="template" value="classic" class="hidden peer">
+                                <label for="template2" class="inline-flex justify-between items-center p-3 w-full text-gray-500 bg-white rounded-lg border border-gray-200 cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700">
+                                    <div class="block">
+                                        <div class="font-semibold">Clásico</div>
+                                        <div class="text-xs">Estilo tradicional</div>
+                                    </div>
+                                    <i class="bi bi-check-circle text-lg"></i>
+                                </label>
+                            </div>
+                            <div>
+                                <input type="radio" id="template3" name="template" value="minimal" class="hidden peer">
+                                <label for="template3" class="inline-flex justify-between items-center p-3 w-full text-gray-500 bg-white rounded-lg border border-gray-200 cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700">
+                                    <div class="block">
+                                        <div class="font-semibold">Minimalista</div>
+                                        <div class="text-xs">Diseño limpio</div>
+                                    </div>
+                                    <i class="bi bi-check-circle text-lg"></i>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contenido -->
+                    <div class="mb-6">
+                        <label for="documentContent" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            <i class="bi bi-text-paragraph mr-2"></i>Contenido del Documento
+                        </label>
+                        <textarea id="documentContent" name="documentContent" rows="10"
+                                  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                  placeholder="Escribe el contenido de tu documento aquí...">Estimado/a [Nombre del Cliente],
+
+Nos complace presentarle nuestro [Tipo de Documento] para los servicios acordados.
+
+Este documento detalla los términos y condiciones, así como los servicios a proporcionar.
+
+Fecha de inicio: [Fecha]
+Fecha de finalización: [Fecha]
+Monto total: [Monto]
+
+Quedamos a su disposición para cualquier consulta.
+
+Atentamente,
+[Su Nombre]
+[Su Compañía]</textarea>
+                    </div>
+
+                    <!-- Opciones Avanzadas -->
+                    <div class="mb-8">
+                        <button type="button" id="advancedOptionsToggle"
+                                class="flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium">
+                            <i class="bi bi-gear mr-2"></i>
+                            Opciones Avanzadas
+                            <i id="advancedOptionsIcon" class="bi bi-chevron-down ml-2 transition-transform"></i>
+                        </button>
+                        
+                        <div id="advancedOptions" class="hidden mt-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="inline-flex items-center">
+                                        <input type="checkbox" name="includeWatermark" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Incluir marca de agua</span>
+                                    </label>
+                                </div>
+                                <div>
+                                    <label class="inline-flex items-center">
+                                        <input type="checkbox" name="passwordProtect" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Proteger con contraseña</span>
+                                    </label>
+                                </div>
+                                <div>
+                                    <label class="inline-flex items-center">
+                                        <input type="checkbox" name="includeSignature" checked class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Incluir firma digital</span>
+                                    </label>
+                                </div>
+                                <div>
+                                    <label class="inline-flex items-center">
+                                        <input type="checkbox" name="sendNotification" checked class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Enviar notificación</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <label for="documentLanguage" class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Idioma del Documento
+                                </label>
+                                <select id="documentLanguage" name="documentLanguage"
+                                        class="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
+                                    <option value="es" selected>Español</option>
+                                    <option value="en">English</option>
+                                    <option value="fr">Français</option>
+                                    <option value="de">Deutsch</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botones de Acción -->
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <button type="button" onclick="previewDocument()"
+                                class="flex-1 inline-flex justify-center items-center px-5 py-3 text-base font-medium text-center text-gray-900 bg-gray-100 rounded-lg hover:bg-gray-200 focus:ring-4 focus:ring-gray-300 dark:text-white dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-800 transition-colors">
+                            <i class="bi bi-eye mr-2"></i>
+                            Vista Previa
+                        </button>
+                        
+                        <button type="submit"
+                                class="flex-1 inline-flex justify-center items-center px-5 py-3 text-base font-medium text-center text-white bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg hover:from-blue-700 hover:to-blue-800 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800 transition-all duration-200">
+                            <i class="bi bi-magic mr-2"></i>
+                            Generar Documento
+                        </button>
+                        
+                        <button type="button" onclick="saveAsDraft()"
+                                class="flex-1 inline-flex justify-center items-center px-5 py-3 text-base font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 dark:text-white dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 dark:focus:ring-gray-800 transition-colors">
+                            <i class="bi bi-save mr-2"></i>
+                            Guardar como Borrador
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Panel Lateral -->
+        <div class="lg:col-span-1">
+            <!-- Vista Previa -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 mb-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    <i class="bi bi-eye mr-2 text-blue-600 dark:text-blue-400"></i>Vista Previa
+                </h3>
+                
+                <div id="documentPreview" class="document-preview rounded-lg p-6 text-white text-center mb-4">
+                    <div class="bg-white/20 backdrop-blur-sm rounded-lg p-4">
+                        <i class="bi bi-file-earmark-text text-4xl mb-3"></i>
+                        <div class="text-xl font-bold">[Nombre del Documento]</div>
+                        <div class="text-sm opacity-90">Tipo: [Tipo de Documento]</div>
+                    </div>
+                </div>
+                
+                <div class="text-sm text-gray-600 dark:text-gray-400">
+                    <div class="flex justify-between mb-2">
+                        <span>Costo estimado:</span>
+                        <span class="font-semibold text-green-600 dark:text-green-400">$15.00</span>
+                    </div>
+                    <div class="flex justify-between mb-2">
+                        <span>Tiempo estimado:</span>
+                        <span class="font-semibold">2-3 minutos</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Saldo disponible:</span>
+                        <span class="font-semibold">$1,250.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Plantillas Recientes -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    <i class="bi bi-clock-history mr-2 text-blue-600 dark:text-blue-400"></i>Plantillas Recientes
+                </h3>
+                
+                <div class="space-y-3">
+                    <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
+                        <i class="bi bi-file-earmark-text text-blue-500 text-xl mr-3"></i>
+                        <div class="flex-1">
+                            <div class="font-medium text-gray-900 dark:text-white">Contrato Simple</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400">Usado hace 2 días</div>
+                        </div>
+                        <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                            <i class="bi bi-arrow-clockwise"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
+                        <i class="bi bi-receipt text-green-500 text-xl mr-3"></i>
+                        <div class="flex-1">
+                            <div class="font-medium text-gray-900 dark:text-white">Factura Básica</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400">Usado hace 1 semana</div>
+                        </div>
+                        <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                            <i class="bi bi-arrow-clockwise"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
+                        <i class="bi bi-file-text text-purple-500 text-xl mr-3"></i>
+                        <div class="flex-1">
+                            <div class="font-medium text-gray-900 dark:text-white">Propuesta Técnica</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400">Usado hace 2 semanas</div>
+                        </div>
+                        <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                            <i class="bi bi-arrow-clockwise"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <button onclick="showTemplatesModal()"
+                            class="w-full inline-flex justify-center items-center px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                        <i class="bi bi-collection mr-2"></i>
+                        Ver más plantillas
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Plantillas -->
+<div id="templatesModal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="templates-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+        
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        
+        <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
+            <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="sm:flex sm:items-start">
+                    <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                        <h3 class="text-2xl leading-6 font-bold text-gray-900 dark:text-white mb-6" id="templates-title">
+                            <i class="bi bi-collection mr-2"></i>Plantillas Disponibles
+                        </h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {% set templates = [
+                                {'name': 'Contrato Legal', 'icon': 'bi-file-earmark-text', 'color': 'blue', 'desc': 'Para acuerdos formales'},
+                                {'name': 'Factura Pro', 'icon': 'bi-receipt', 'color': 'green', 'desc': 'Factura detallada'},
+                                {'name': 'Propuesta', 'icon': 'bi-file-text', 'color': 'purple', 'desc': 'Propuesta comercial'},
+                                {'name': 'Informe', 'icon': 'bi-file-earmark-bar-graph', 'color': 'yellow', 'desc': 'Informe ejecutivo'},
+                                {'name': 'Carta', 'icon': 'bi-envelope', 'color': 'red', 'desc': 'Carta formal'},
+                                {'name': 'Certificado', 'icon': 'bi-award', 'color': 'indigo', 'desc': 'Certificado oficial'}
+                            ] %}
+                            
+                            {% for template in templates %}
+                            <div class="template-card p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-300 dark:hover:border-blue-700 cursor-pointer transition-colors"
+                                 onclick="selectTemplate('{{ template.name }}')">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-10 h-10 rounded-full bg-{{ template.color }}-100 dark:bg-{{ template.color }}-900/30 flex items-center justify-center mr-3">
+                                        <i class="bi {{ template.icon }} text-{{ template.color }}-600 dark:text-{{ template.color }}-400"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-semibold text-gray-900 dark:text-white">{{ template.name }}</div>
+                                        <div class="text-xs text-gray-500 dark:text-gray-400">{{ template.desc }}</div>
+                                    </div>
+                                </div>
+                                <button class="w-full mt-2 py-2 text-sm font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                                    Seleccionar Plantilla
+                                </button>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-700/50 px-4 py-3 sm:px-6">
+                <button type="button" onclick="hideTemplatesModal()"
+                        class="w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-700 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Toggle opciones avanzadas
+document.getElementById('advancedOptionsToggle').addEventListener('click', function() {
+    const options = document.getElementById('advancedOptions');
+    const icon = document.getElementById('advancedOptionsIcon');
+    
+    if (options.classList.contains('hidden')) {
+        options.classList.remove('hidden');
+        icon.classList.remove('bi-chevron-down');
+        icon.classList.add('bi-chevron-up');
+    } else {
+        options.classList.add('hidden');
+        icon.classList.remove('bi-chevron-up');
+        icon.classList.add('bi-chevron-down');
+    }
+});
+
+// Vista previa del documento
+function previewDocument() {
+    const docName = document.getElementById('documentName').value || '[Nombre del Documento]';
+    const docType = document.getElementById('documentType').value || '[Tipo de Documento]';
+    const preview = document.getElementById('documentPreview');
+    
+    preview.innerHTML = `
+        <div class="bg-white/20 backdrop-blur-sm rounded-lg p-4">
+            <i class="bi bi-file-earmark-text text-4xl mb-3"></i>
+            <div class="text-xl font-bold">${docName}</div>
+            <div class="text-sm opacity-90">Tipo: ${docType}</div>
+            <div class="text-xs opacity-75 mt-2">Vista previa generada</div>
+        </div>
+    `;
+    
+    // Mostrar notificación
+    showNotification('Vista previa generada exitosamente', 'success');
+}
+
+// Guardar como borrador
+function saveAsDraft() {
+    if (confirm('¿Deseas guardar este documento como borrador?')) {
+        showNotification('Documento guardado como borrador', 'success');
+    }
+}
+
+// Modal de plantillas
+function showTemplatesModal() {
+    const modal = document.getElementById('templatesModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    document.body.classList.add('overflow-hidden');
+}
+
+function hideTemplatesModal() {
+    const modal = document.getElementById('templatesModal');
+    modal.classList.remove('flex');
+    modal.classList.add('hidden');
+    document.body.classList.remove('overflow-hidden');
+}
+
+function selectTemplate(templateName) {
+    // Actualizar el formulario con la plantilla seleccionada
+    const docTypeSelect = document.getElementById('documentType');
+    const docNameInput = document.getElementById('documentName');
+    
+    // Buscar la opción que coincida
+    for (let option of docTypeSelect.options) {
+        if (option.text.includes(templateName.split(' ')[0])) {
+            option.selected = true;
+            break;
+        }
+    }
+    
+    docNameInput.value = `${templateName} - ${new Date().getFullYear()}`;
+    
+    // Actualizar vista previa
+    previewDocument();
+    
+    // Cerrar modal
+    hideTemplatesModal();
+    
+    showNotification(`Plantilla "${templateName}" seleccionada`, 'info');
+}
+
+// Actualizar vista previa en tiempo real
+document.getElementById('documentName').addEventListener('input', previewDocument);
+document.getElementById('documentType').addEventListener('change', previewDocument);
+
+// Función para mostrar notificaciones
+function showNotification(message, type = 'info') {
+    // En un proyecto real, integrarías con un sistema de notificaciones
+    // Por ahora, mostramos un alert temporal
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg animate-fade-in ${
+        type === 'success' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' :
+        type === 'error' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' :
+        'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300'
+    }`;
+    alertDiv.innerHTML = `
+        <div class="flex items-center">
+            <i class="bi ${
+                type === 'success' ? 'bi-check-circle' :
+                type === 'error' ? 'bi-x-circle' : 'bi-info-circle'
+            } mr-2 text-lg"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    document.body.appendChild(alertDiv);
+    
+    // Remover después de 3 segundos
+    setTimeout(() => {
+        alertDiv.classList.add('animate-fade-out');
+        setTimeout(() => alertDiv.remove(), 300);
+    }, 3000);
+}
+
+// Inicializar vista previa
+document.addEventListener('DOMContentLoaded', previewDocument);
+</script>
+{% endblock %}

@@ -1,0 +1,405 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - SaaS App{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Encabezado -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                <i class="bi bi-speedometer2 mr-2 text-blue-600 dark:text-blue-400"></i>Dashboard
+            </h1>
+            <p class="text-gray-600 dark:text-gray-300">
+                Bienvenido de vuelta, <span class="font-semibold text-blue-600 dark:text-blue-400">Usuario Demo</span>
+            </p>
+        </div>
+        <div class="mt-4 md:mt-0">
+            <a href="{{ url_for('dashboard.generate_document') }}" 
+               class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-lg hover:from-blue-700 hover:to-blue-800 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800 transition-all duration-200">
+                <i class="bi bi-file-earmark-plus mr-2"></i>
+                Generar Nuevo Documento
+            </a>
+        </div>
+    </div>
+
+    <!-- Tarjeta de Saldo -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="col-span-1 md:col-span-2">
+            <div class="card-hover bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+                    <div class="mb-4 md:mb-0">
+                        <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                            <i class="bi bi-wallet2 mr-2 text-green-500"></i>Saldo Actual
+                        </h2>
+                        <div class="flex items-baseline">
+                            <span class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white">$1,250.00</span>
+                            <span class="ml-2 text-sm text-green-500 bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded-full">
+                                <i class="bi bi-arrow-up mr-1"></i>+2.5%
+                            </span>
+                        </div>
+                        <p class="text-gray-500 dark:text-gray-400 text-sm mt-2">
+                            Saldo disponible para generar documentos
+                        </p>
+                    </div>
+                    <button onclick="showAddBalanceModal()"
+                            class="inline-flex items-center px-5 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-medium rounded-lg hover:from-green-600 hover:to-emerald-700 focus:ring-4 focus:ring-green-300 dark:focus:ring-green-800 transition-all duration-200">
+                        <i class="bi bi-plus-circle mr-2"></i>
+                        Añadir Saldo
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tarjeta de Estadísticas -->
+        <div class="col-span-1">
+            <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white">
+                <h3 class="text-lg font-semibold mb-4">
+                    <i class="bi bi-graph-up-arrow mr-2"></i>Estadísticas Rápidas
+                </h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-blue-100">Documentos este mes</span>
+                        <span class="font-bold text-xl">12</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-blue-100">Gastos totales</span>
+                        <span class="font-bold text-xl">$345.50</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-blue-100">Última recarga</span>
+                        <span class="font-bold text-xl">Hace 3 días</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Documentos Generados -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div class="col-span-1">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                    <h2 class="text-xl font-semibold text-gray-800 dark:text-white">
+                        <i class="bi bi-files mr-2 text-blue-600 dark:text-blue-400"></i>Documentos Generados
+                    </h2>
+                    <span class="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                        {{ documents|length }} documentos
+                    </span>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                            <tr>
+                                <th scope="col" class="px-6 py-3">Nombre</th>
+                                <th scope="col" class="px-6 py-3">Fecha</th>
+                                <th scope="col" class="px-6 py-3">Estado</th>
+                                <th scope="col" class="px-6 py-3">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for doc in documents %}
+                            <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                <td class="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <i class="bi bi-file-earmark-text mr-3 text-blue-500"></i>
+                                        <div>
+                                            <div class="font-medium">{{ doc.nombre }}</div>
+                                            <div class="text-xs text-gray-500 dark:text-gray-400">{{ doc.tipo|title }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    {{ doc.fecha }}
+                                </td>
+                                <td class="px-6 py-4">
+                                    {% if doc.estado == 'completado' %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+                                        <i class="bi bi-check-circle mr-1"></i> Completado
+                                    </span>
+                                    {% elif doc.estado == 'procesando' %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">
+                                        <i class="bi bi-hourglass-split mr-1"></i> Procesando
+                                    </span>
+                                    {% else %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">
+                                        <i class="bi bi-clock-history mr-1"></i> Pendiente
+                                    </span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex space-x-2">
+                                        <button class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
+                                            <i class="bi bi-download text-lg"></i>
+                                        </button>
+                                        <button class="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300">
+                                            <i class="bi bi-eye text-lg"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="px-6 py-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
+                    <a href="{{ url_for('dashboard.generate_document') }}" 
+                       class="text-sm text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 font-medium inline-flex items-center">
+                        <i class="bi bi-plus-circle mr-1"></i>
+                        Generar nuevo documento
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Historial de Movimientos -->
+        <div class="col-span-1">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700 h-full">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                    <h2 class="text-xl font-semibold text-gray-800 dark:text-white">
+                        <i class="bi bi-clock-history mr-2 text-blue-600 dark:text-blue-400"></i>Historial de Movimientos
+                    </h2>
+                    <button class="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
+                        Ver todos
+                    </button>
+                </div>
+                
+                <div class="divide-y divide-gray-200 dark:divide-gray-700 max-h-[400px] overflow-y-auto">
+                    {% for trans in transactions %}
+                    <div class="px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 mr-4">
+                                    {% if trans.tipo == 'recarga' %}
+                                    <div class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                                        <i class="bi bi-arrow-down-left text-green-600 dark:text-green-400 text-lg"></i>
+                                    </div>
+                                    {% elif trans.tipo == 'gasto' %}
+                                    <div class="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                                        <i class="bi bi-arrow-up-right text-red-600 dark:text-red-400 text-lg"></i>
+                                    </div>
+                                    {% else %}
+                                    <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                                        <i class="bi bi-currency-dollar text-blue-600 dark:text-blue-400 text-lg"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-gray-900 dark:text-white">{{ trans.descripcion }}</h4>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                                        {{ trans.fecha }}
+                                        {% if trans.estado == 'pendiente' %}
+                                        <span class="ml-2 text-xs text-yellow-600 dark:text-yellow-400">
+                                            <i class="bi bi-clock mr-1"></i>Pendiente
+                                        </span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-medium {% if trans.monto > 0 %}text-green-600 dark:text-green-400{% else %}text-red-600 dark:text-red-400{% endif %}">
+                                    {% if trans.monto > 0 %}+{% endif %}${{ trans.monto|abs|round(2) }}
+                                </div>
+                                <div class="text-xs text-gray-500 dark:text-gray-400 capitalize">
+                                    {{ trans.tipo }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <div class="px-6 py-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-gray-600 dark:text-gray-400">
+                            Mostrando {{ transactions|length }} de 24 movimientos
+                        </span>
+                        <button class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 font-medium">
+                            <i class="bi bi-filter mr-1"></i>
+                            Filtrar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tarjetas de Acción Rápida -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="card-hover bg-white dark:bg-gray-800 rounded-lg p-5 border border-gray-200 dark:border-gray-700 text-center">
+            <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                <i class="bi bi-file-earmark-text text-2xl text-blue-600 dark:text-blue-400"></i>
+            </div>
+            <h3 class="font-semibold text-gray-900 dark:text-white mb-1">Generar PDF</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Crea documentos profesionales</p>
+        </div>
+        
+        <div class="card-hover bg-white dark:bg-gray-800 rounded-lg p-5 border border-gray-200 dark:border-gray-700 text-center">
+            <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                <i class="bi bi-credit-card text-2xl text-green-600 dark:text-green-400"></i>
+            </div>
+            <h3 class="font-semibold text-gray-900 dark:text-white mb-1">Recargar Saldo</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Añade fondos a tu cuenta</p>
+        </div>
+        
+        <div class="card-hover bg-white dark:bg-gray-800 rounded-lg p-5 border border-gray-200 dark:border-gray-700 text-center">
+            <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                <i class="bi bi-graph-up text-2xl text-purple-600 dark:text-purple-400"></i>
+            </div>
+            <h3 class="font-semibold text-gray-900 dark:text-white mb-1">Reportes</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Analiza tu actividad</p>
+        </div>
+        
+        <div class="card-hover bg-white dark:bg-gray-800 rounded-lg p-5 border border-gray-200 dark:border-gray-700 text-center">
+            <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center">
+                <i class="bi bi-gear text-2xl text-yellow-600 dark:text-yellow-400"></i>
+            </div>
+            <h3 class="font-semibold text-gray-900 dark:text-white mb-1">Configuración</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Personaliza tu cuenta</p>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Añadir Saldo -->
+<div id="addBalanceModal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+        
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        
+        <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="sm:flex sm:items-start">
+                    <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 dark:bg-green-900 sm:mx-0 sm:h-10 sm:w-10">
+                        <i class="bi bi-credit-card text-green-600 dark:text-green-400 text-xl"></i>
+                    </div>
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white" id="modal-title">
+                            Añadir Saldo a tu Cuenta
+                        </h3>
+                        <div class="mt-2">
+                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                Selecciona el monto que deseas añadir a tu cuenta. Esta es una simulación, no se procesará ningún pago real.
+                            </p>
+                            
+                            <div class="mt-4 grid grid-cols-3 gap-3">
+                                {% set amounts = [10, 25, 50, 100, 250, 500] %}
+                                {% for amount in amounts %}
+                                <button class="amount-option py-3 px-4 border border-gray-300 dark:border-gray-600 rounded-lg text-center hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+                                        data-amount="{{ amount }}">
+                                    <div class="font-semibold text-gray-900 dark:text-white">${{ amount }}</div>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400">USD</div>
+                                </button>
+                                {% endfor %}
+                            </div>
+                            
+                            <div class="mt-4">
+                                <label for="customAmount" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    O ingresa un monto personalizado
+                                </label>
+                                <div class="relative rounded-md shadow-sm">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <span class="text-gray-500 dark:text-gray-400 sm:text-sm">$</span>
+                                    </div>
+                                    <input type="number" id="customAmount" name="customAmount"
+                                           class="block w-full pl-7 pr-12 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-blue-500 focus:border-blue-500"
+                                           placeholder="0.00" min="1" max="1000" step="0.01">
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <span class="text-gray-500 dark:text-gray-400 sm:text-sm">USD</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-700/50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button type="button" onclick="confirmAddBalance()"
+                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-base font-medium text-white hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm">
+                    <i class="bi bi-check-circle mr-2"></i>Confirmar Recarga
+                </button>
+                <button type="button" onclick="hideAddBalanceModal()"
+                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-700 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Funciones para el modal de añadir saldo
+function showAddBalanceModal() {
+    const modal = document.getElementById('addBalanceModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    document.body.classList.add('overflow-hidden');
+    
+    // Resetear selección
+    document.querySelectorAll('.amount-option').forEach(btn => {
+        btn.classList.remove('border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/20');
+        btn.classList.add('border-gray-300', 'dark:border-gray-600');
+    });
+    document.getElementById('customAmount').value = '';
+}
+
+function hideAddBalanceModal() {
+    const modal = document.getElementById('addBalanceModal');
+    modal.classList.remove('flex');
+    modal.classList.add('hidden');
+    document.body.classList.remove('overflow-hidden');
+}
+
+function confirmAddBalance() {
+    // Simular recarga de saldo
+    alert('Simulación: Saldo añadido exitosamente');
+    hideAddBalanceModal();
+    
+    // Mostrar notificación (simulada)
+    if (window.showNotification) {
+        showNotification('Recarga de saldo procesada exitosamente', 'success');
+    }
+}
+
+// Seleccionar monto predefinido
+document.addEventListener('DOMContentLoaded', function() {
+    const amountOptions = document.querySelectorAll('.amount-option');
+    const customAmountInput = document.getElementById('customAmount');
+    
+    amountOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            // Deseleccionar otros
+            amountOptions.forEach(btn => {
+                btn.classList.remove('border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/20');
+                btn.classList.add('border-gray-300', 'dark:border-gray-600');
+            });
+            
+            // Seleccionar este
+            this.classList.remove('border-gray-300', 'dark:border-gray-600');
+            this.classList.add('border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/20');
+            
+            // Establecer en input personalizado
+            customAmountInput.value = this.dataset.amount;
+        });
+    });
+    
+    // Cuando se escribe en el input personalizado, deseleccionar opciones
+    customAmountInput.addEventListener('input', function() {
+        amountOptions.forEach(btn => {
+            btn.classList.remove('border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/20');
+            btn.classList.add('border-gray-300', 'dark:border-gray-600');
+        });
+    });
+});
+
+// Función para mostrar notificaciones (simulada)
+function showNotification(message, type = 'info') {
+    // Esta función se integraría con tu sistema de notificaciones
+    console.log(`[${type.toUpperCase()}] ${message}`);
+}
+</script>
+{% endblock %}

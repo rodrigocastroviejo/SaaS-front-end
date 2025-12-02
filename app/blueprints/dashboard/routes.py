@@ -7,9 +7,7 @@ from app.utils.mock_data import generate_documents, generate_transactions
 def index():
     documents = generate_documents(5)
     transactions = generate_transactions(8)
-    return render_template('dashboard/index.html', 
-                         documents=documents, 
-                         transactions=transactions)
+    return render_template('auth/index.html', documents=documents, transactions=transactions)
 
 @dashboard_bp.route('/generate-document', methods=['GET', 'POST'])
 def generate_document():
@@ -17,4 +15,4 @@ def generate_document():
         # Simulación de generación de documento
         flash('Documento generado exitosamente (simulación)', 'success')
         return redirect(url_for('dashboard.index'))
-    return render_template('dashboard/generate_document.html')
+    return render_template('auth/generate_document.html')
