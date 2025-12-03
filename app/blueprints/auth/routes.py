@@ -2,6 +2,7 @@ from flask import render_template, redirect, url_for, request, flash
 from app.blueprints.auth import auth_bp
 from datetime import datetime
 
+@auth_bp.route('/')
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':

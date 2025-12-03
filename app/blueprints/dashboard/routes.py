@@ -3,8 +3,7 @@ from app.blueprints.dashboard import dashboard_bp
 from app.utils.mock_data import generate_documents, generate_transactions
 from datetime import datetime
 
-@dashboard_bp.route('/')
-@dashboard_bp.route('/dashboard')
+@dashboard_bp.route('')
 def index():
     documents = generate_documents(5)
     transactions = generate_transactions(8)
