@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}SaaS App{% endblock %}</title>
     
+
+    
+    <!-- ===== SCRIPT CRÍTICO DEL TEMA - CARGADO DE FORMA SINCRÓNICA ===== -->
+    <!-- Esto es importante: se carga SIN async/defer para ejecutarse inmediatamente -->
+    <script src="{{ url_for('static', filename='js/theme-init.js') }}"></script>
     <!-- Flowbite CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/flowbite@2.2.1/dist/flowbite.min.css" rel="stylesheet" />
@@ -44,7 +49,6 @@
     {% include 'components/footer.html' %}
     
     <!-- Flowbite JS -->
-    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/flowbite@2.2.1/dist/flowbite.min.js"></script>
     <!-- Tema toggle JS -->
     <script src="{{ url_for('static', filename='js/theme-toggle.js') }}"></script>
