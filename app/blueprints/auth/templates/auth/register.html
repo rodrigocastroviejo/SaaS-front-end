@@ -1,0 +1,347 @@
+{% extends "base.html" %}
+
+{% block title %}Registrarse - SaaS App{% endblock %}
+
+{% block extra_css %}
+<style>
+    .register-bg {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .register-bg::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    
+    .progress-bar {
+        height: 4px;
+        background: linear-gradient(to right, #10b981 var(--progress), #e5e7eb var(--progress));
+        transition: --progress 0.5s ease;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center register-bg py-12 px-4 sm:px-6 lg:px-8">
+    <div class="w-full max-w-md space-y-8 z-10">
+        <!-- Logo y Título -->
+        <div class="text-center">
+            <div class="mx-auto w-16 h-16 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center shadow-lg mb-4">
+                <i class="bi bi-person-plus text-3xl text-blue-600 dark:text-blue-400"></i>
+            </div>
+            <h2 class="text-3xl font-bold text-white">
+                Crear una cuenta
+            </h2>
+            <p class="mt-2 text-blue-100">
+                Únete a SaaS App y comienza a generar documentos
+            </p>
+        </div>
+
+        <!-- Card del Formulario -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden">
+            
+            <div class="px-8 py-8 sm:p-10">
+                <form id="registerForm" method="POST" action="{{ url_for('auth.register') }}" class="space-y-6">
+                    <!-- Nombre Completo -->
+                    <div>
+                        <label for="fullName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            <i class="bi bi-person-circle mr-2"></i>Nombre completo
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="bi bi-person text-gray-400"></i>
+                            </div>
+                            <input type="text" id="fullName" name="fullName" required
+                                   class="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                   placeholder="Juan Pérez">
+                        </div>
+                    </div>
+
+                    <!-- Email -->
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            <i class="bi bi-envelope mr-2"></i>Correo electrónico
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="bi bi-envelope text-gray-400"></i>
+                            </div>
+                            <input type="email" id="email" name="email" required
+                                   class="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                   placeholder="usuario@ejemplo.com">
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                            Usaremos este email para notificaciones importantes.
+                        </p>
+                    </div>
+
+                    <!-- Password -->
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            <i class="bi bi-key mr-2"></i>Contraseña
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="bi bi-lock text-gray-400"></i>
+                            </div>
+                            <input type="password" id="password" name="password" required
+                                   class="block w-full pl-10 pr-10 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                   placeholder="••••••••">
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                <button type="button" id="togglePassword" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Password Strength -->
+                        <div class="mt-2 space-y-2">
+                            <div class="text-xs text-gray-500 dark:text-gray-400">Seguridad de la contraseña:</div>
+                            <div class="grid grid-cols-4 gap-1">
+                                <div class="h-1 rounded bg-gray-200 dark:bg-gray-700"></div>
+                                <div class="h-1 rounded bg-gray-200 dark:bg-gray-700"></div>
+                                <div class="h-1 rounded bg-gray-200 dark:bg-gray-700"></div>
+                                <div class="h-1 rounded bg-gray-200 dark:bg-gray-700"></div>
+                            </div>
+                            <ul class="text-xs text-gray-500 dark:text-gray-400 space-y-1 mt-2">
+                                <li class="flex items-center">
+                                    <i class="bi bi-check-circle text-green-500 mr-2"></i>
+                                    Al menos 8 caracteres
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="bi bi-x-circle text-gray-300 dark:text-gray-600 mr-2"></i>
+                                    Incluir números y símbolos
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div>
+                        <label for="confirmPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            <i class="bi bi-key-fill mr-2"></i>Confirmar contraseña
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="bi bi-lock-fill text-gray-400"></i>
+                            </div>
+                            <input type="password" id="confirmPassword" name="confirmPassword" required
+                                   class="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                   placeholder="••••••••">
+                        </div>
+                    </div>
+
+                    <!-- Terms and Conditions -->
+                    <div class="flex items-start">
+                        <div class="flex items-center h-5">
+                            <input id="terms" name="terms" type="checkbox" required
+                                   class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700">
+                        </div>
+                        <div class="ml-3 text-sm">
+                            <label for="terms" class="font-medium text-gray-700 dark:text-gray-300">
+                                Acepto los términos y condiciones
+                            </label>
+                            <p class="text-gray-500 dark:text-gray-400">
+                                Al crear una cuenta, aceptas nuestros 
+                                <a href="#" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">Términos de Servicio</a>, 
+                                <a href="#" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">Política de Privacidad</a> y 
+                                <a href="#" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">Política de Cookies</a>.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div>
+                        <button type="submit"
+                                class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-offset-gray-800 transition-all duration-200">
+                            <i class="bi bi-person-plus mr-2"></i>
+                            Crear cuenta
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Login Link -->
+                <div class="mt-8 text-center">
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                        ¿Ya tienes una cuenta?
+                        <a href="{{ url_for('auth.login') }}" class="font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 ml-1">
+                            Inicia sesión aquí
+                        </a>
+                    </p>
+                </div>
+            </div>
+            
+            
+        </div>
+
+        <!-- Security Info -->
+        <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+            <div class="flex items-center text-white">
+                <i class="bi bi-shield-check text-xl mr-3"></i>
+                <div>
+                    <h4 class="font-semibold">Seguridad garantizada</h4>
+                    <div class="text-sm text-blue-100 mt-1">
+                        <p>Tus datos están protegidos con encriptación de nivel bancario.</p>
+                        <p class="mt-1 text-xs opacity-90">Este es un proyecto de demostración sin datos reales.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+// Toggle password visibility
+function setupPasswordToggle(passwordId, toggleId) {
+    const toggleBtn = document.getElementById(toggleId);
+    const passwordInput = document.getElementById(passwordId);
+    
+    if (toggleBtn && passwordInput) {
+        toggleBtn.addEventListener('click', function() {
+            const icon = this.querySelector('i');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
+            }
+        });
+    }
+}
+
+// Setup password toggles
+setupPasswordToggle('password', 'togglePassword');
+
+// Password strength indicator
+document.getElementById('password').addEventListener('input', function(e) {
+    const password = e.target.value;
+    const strengthBars = document.querySelectorAll('.grid.grid-cols-4.gap-1 > div');
+    
+    // Reset all bars
+    strengthBars.forEach(bar => {
+        bar.className = 'h-1 rounded bg-gray-200 dark:bg-gray-700';
+    });
+    
+    // Calculate strength (simple example)
+    let strength = 0;
+    if (password.length >= 8) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/[0-9]/.test(password)) strength++;
+    if (/[^A-Za-z0-9]/.test(password)) strength++;
+    
+    // Update bars
+    for (let i = 0; i < strength; i++) {
+        let colorClass;
+        if (strength === 1) colorClass = 'bg-red-500';
+        else if (strength === 2) colorClass = 'bg-yellow-500';
+        else if (strength === 3) colorClass = 'bg-blue-500';
+        else if (strength >= 4) colorClass = 'bg-green-500';
+        
+        strengthBars[i].className = `h-1 rounded ${colorClass}`;
+    }
+    
+    // Update checklist
+    const checklistItems = document.querySelectorAll('ul.text-xs.space-y-1.mt-2 li');
+    const checks = [
+        password.length >= 8,
+        /[A-Z]/.test(password) && /[0-9]/.test(password) && /[^A-Za-z0-9]/.test(password)
+    ];
+    
+    checklistItems.forEach((item, index) => {
+        const icon = item.querySelector('i');
+        if (checks[index]) {
+            icon.className = 'bi bi-check-circle text-green-500 mr-2';
+        } else {
+            icon.className = 'bi bi-x-circle text-gray-300 dark:text-gray-600 mr-2';
+        }
+    });
+});
+
+// Form submission with animation
+document.getElementById('registerForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Validate passwords match
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    
+    if (password !== confirmPassword) {
+        showNotification('Las contraseñas no coinciden', 'error');
+        return;
+    }
+    
+    const submitButton = this.querySelector('button[type="submit"]');
+    const originalText = submitButton.innerHTML;
+    
+    // Show loading state
+    submitButton.innerHTML = '<i class="bi bi-arrow-clockwise animate-spin mr-2"></i> Creando cuenta...';
+    submitButton.disabled = true;
+    
+    // Simulate API call
+    setTimeout(() => {
+        // Submit the form
+        this.submit();
+        
+        // Restore button (this won't execute if page redirects)
+        submitButton.innerHTML = originalText;
+        submitButton.disabled = false;
+    }, 2000);
+});
+
+// Show notification
+function showNotification(message, type = 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg animate-fade-in ${
+        type === 'error' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' :
+        'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300'
+    }`;
+    notification.innerHTML = `
+        <div class="flex items-center">
+            <i class="bi ${type === 'error' ? 'bi-x-circle' : 'bi-info-circle'} mr-2 text-lg"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Remove after 4 seconds
+    setTimeout(() => {
+        notification.classList.add('animate-fade-out');
+        setTimeout(() => notification.remove(), 300);
+    }, 4000);
+}
+
+// Add floating animation to logo
+document.addEventListener('DOMContentLoaded', function() {
+    const logo = document.querySelector('.mx-auto.w-16.h-16');
+    if (logo) {
+        logo.style.animation = 'float 6s ease-in-out infinite';
+        
+        // Add keyframes for floating animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes float {
+                0%, 100% { transform: translateY(0px); }
+                50% { transform: translateY(-10px); }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+});
+</script>
+{% endblock %}

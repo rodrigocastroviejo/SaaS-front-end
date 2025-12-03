@@ -65,3 +65,26 @@
 .fade-in {
     animation: fadeIn 0.3s ease-out;
 }
+
+/* Scrollbar claro (modo light) */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #d4d4d4;
+    border-radius: 4px;
+}
+
+/* Scrollbar oscuro (modo dark) */
+.dark ::-webkit-scrollbar-track {
+    background: #1f2937; /* gray-800 */
+}
+
+.dark ::-webkit-scrollbar-thumb {
+    background: #4b5563; /* gray-600 */
+}
